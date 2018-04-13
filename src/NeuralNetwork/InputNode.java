@@ -1,8 +1,12 @@
 package NeuralNetwork;
 
-public class InputNode extends Node{
+import java.io.Serializable;
+
+public class InputNode extends Node implements Serializable{
+
+	private static final long serialVersionUID = -3035568382888656184L;
 	double input = 0;
-	
+
 	public InputNode(int id) {
 		super(id);
 		incomingEdges = null;
@@ -19,8 +23,13 @@ public class InputNode extends Node{
 			}
 		}
 	}
-	
+
 	public void setInput(double i){
 		input = i;
 	}
+
+	public double getInput(){
+		return input;
+	}
+
 }

@@ -1,46 +1,60 @@
 package NeuralNetwork;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Scanner;
+
+import Evolution.NEATNetwork;
 
 
-public class NeuralNetwork{
+public class NeuralNetwork implements Serializable{
+
+	private static final long serialVersionUID = 8293811672911369737L;
 	protected ArrayList<Layer<HiddenNode>> hiddenLayers = new ArrayList<Layer<HiddenNode>>();
 	protected Layer<InputNode> inputLayer = new Layer<InputNode>();
 	protected Layer<OutputNode> outputLayer = new Layer<OutputNode>();
-	
+
 	public void addInputNode(InputNode in){
 		inputLayer.add(in);
 	}
-	
+
 	public void addOutputNode(OutputNode on){
 		outputLayer.add(on);
 	}
-	
+
 	public void addHiddenLayer(){
 		hiddenLayers.add(new Layer<HiddenNode>());
 	}
-	
+
 	public void addHiddenNode(HiddenNode hn, int layerDepth){
 		while(hiddenLayers.size()-1 < layerDepth) //keep adding layers until valid depth
 			addHiddenLayer();
-		
+
 		hiddenLayers.get(layerDepth).add(hn);
 	}
-	
+
 	public void connectNodes(Node n1, Node n2){
 		Edge e = new Edge(1);
 		connectNodes(n1, n2, e);
 	}
-	
+
 	public void connectNodes(Node n1, Node n2, Edge e){	//adds connection between n1 and n2
-		
+
 		for(InputNode n : inputLayer.getNodeList()){
 			if(n.equals(n1)){
 				e.setNode1(n1);
 				n.addOutgoingEdge(e);
 			}
 		}
-		
+
 		for(Layer<HiddenNode> l : hiddenLayers){
 			for(Node n : l.getNodeList()){
 				if(n.equals(n1)){
@@ -53,7 +67,7 @@ public class NeuralNetwork{
 				}
 			}
 		}
-		
+
 		for(OutputNode n : outputLayer.getNodeList()){
 			if(n.equals(n2)){
 				e.setNode2(n2);
@@ -61,7 +75,7 @@ public class NeuralNetwork{
 			}
 		}
 	}
-	
+
 	public int getHiddenNodeLayerDepth(HiddenNode hn){
 		for(int i=0; i<hiddenLayers.size(); i++)
 			for(HiddenNode n : hiddenLayers.get(i).getNodeList())
@@ -69,7 +83,7 @@ public class NeuralNetwork{
 					return i;
 		return -1;
 	}
-	
+
 	public void moveHiddenNodeDeeper(HiddenNode hn){
 		for(int i=0; i<hiddenLayers.size(); i++){
 			for(HiddenNode n : hiddenLayers.get(i).getNodeList()){
@@ -86,43 +100,40 @@ public class NeuralNetwork{
 			}
 		}
 	}
-	
-	public void moveHiddenSubTreeDeeper(HiddenNode n, Boolean includeRoot){		//recursively move a sub tree of hidden nodes 1 layer deeper	
+
+	public void moveHiddenSubTreeDeeper(HiddenNode n, Boolean includeRoot){		//recursively move a sub tree of hidden nodes 1 layer deeper
 		if(includeRoot)
 			moveHiddenNodeDeeper(n);
-		
-		for(Edge e : n.getOutgoingEdges()){
-			if(e.getNode2() instanceof HiddenNode){
-				System.out.println(n.getID() + " -> " + e.getNode2().getID());
+
+		for(Edge e : n.getOutgoingEdges())
+			if(e.getNode2() instanceof HiddenNode)
 				moveHiddenSubTreeDeeper((HiddenNode)e.getNode2(), true);
-			}
-		}
 	}
-	
+
 	public ArrayList<Layer<HiddenNode>> getHiddenLayers(){
 		return hiddenLayers;
 	}
-	
+
 	public ArrayList<InputNode> getInputNodes(){
 		return inputLayer.getNodeList();
 	}
-	
+
 	public ArrayList<OutputNode> getOutputNodes(){
 		return outputLayer.getNodeList();
 	}
-	
+
+
 	public void execute(){
-		for(InputNode n : inputLayer.getNodeList()){
-			//update input values
+		for(InputNode n : inputLayer.getNodeList()){	//update input values
 			n.fire();
 		}
-		
+
 		for(Layer<HiddenNode> l : hiddenLayers){
 			for(Node n : l.getNodeList()){
 				n.fire();
 			}
 		}
-		
+
 		for(OutputNode n : outputLayer.getNodeList()){
 			n.fire();
 		}
