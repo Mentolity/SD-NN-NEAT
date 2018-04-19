@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JPanel;
+
 import NeuralNetwork.*;
 
 /*
@@ -18,10 +20,11 @@ public class GNetwork{
 	private HashMap<Integer, GNode> outputLayer;
 	private HashMap<Integer, GEdge> networkEdges; //Keys are incrementing index
 	private ArrayList<String> networkInfo;
-	
+
 	private int totalWidth;
 	private int totalHeight;
-	
+	private int nodeSize;
+	private int numColumns;
 	/*
 	 * Constructor
 	 * 
@@ -29,18 +32,22 @@ public class GNetwork{
 	 * to be changed, calculations for everything need to be done all over again
 	 * Easier to assume fixed size
 	 * */
-	public GNetwork(NeuralNetwork n) {
+	public GNetwork(NeuralNetwork n, int num) {
 		network = n;
-		totalWidth = 1000;
-		totalHeight = 400;
+		numColumns = num;
+		totalWidth = 1250;
+		totalHeight = 750;
+		nodeSize = 30;
+		
+		
 		inputLayer = new HashMap<Integer, GNode>();
 		hiddenLayer = new HashMap<Integer, GNode>();
 		outputLayer = new HashMap<Integer, GNode>();
 		networkEdges = new HashMap<Integer, GEdge>();
 		networkInfo = new ArrayList<String>();
-		
+
 		int edgeIndex = 0;
-		
+
 		/*
 		 * ArrayList variables for the nodes of the network, 
 		 * for the sake of convenience and ease of coding
@@ -48,45 +55,72 @@ public class GNetwork{
 		ArrayList<InputNode> inLayer = network.getInputNodes();
 		ArrayList<Layer<HiddenNode>> hidLayers = network.getHiddenLayers();
 		ArrayList<OutputNode> outLayer = network.getOutputNodes();
-		
+
 		/*
 		 * Placement of the nodes of each layer is dependent on which "region"
 		 * the layer is assigned to.
 		 * For sake of simplicity, assumed that JPanel/ JFrame is of fixed, known size
 		 */
-		
-		int numRegions = 2 + hidLayers.size();
-		double regionSize = (totalWidth-5) / numRegions;
-		double startRegionX = 0;
-		double startRegionY = 0;
-		
+
+		//int numRegions = hidLayers.size();
+		//double regionSize = (totalWidth-5) / numRegions;
+		double startRegionX = nodeSize;
+		double startRegionY = nodeSize;
+
 		/*
 		 * Create and store inLayer GNodes
 		 * ===============================
 		 * Position: Upper Left corner, in grid fashion (not scattered)
 		 * Color: Red
-		 * Opacity: True if there is at least one outgoing edge that is active
+		 * Opacity: Based on the input node value 
 		 */
+		int xCounter = 0;// for determining if max number of nodes per row reached
+
 		for(InputNode input : inLayer) {
-			double newRegionY = 10 + startRegionY;
-			inputLayer.put(input.getID(), new GNode((10+startRegionX),
-													newRegionY,
-													Color.RED));
-			 startRegionY += newRegionY;
-			 
-			 boolean isActive = false;
-			 ArrayList<Edge> outEdges = input.getOutgoingEdges();
-			 for(int i=0; (!isActive)&&i<outEdges.size(); i++){
-				 isActive = outEdges.get(i).isActive();
-			 }
-			 System.out.println("The node is active: " + isActive);
-			 inputLayer.get(input.getID()).setIsActive(isActive);
+
+			/*Creating the initial input GNode*/
+			inputLayer.put(input.getID(), 
+					new GNode(startRegionX, startRegionY, Color.RED));
+
+			/*Incrementing and checking xCounter for grid placement*/
+			xCounter++;
+			if(xCounter == numColumns) {
+				startRegionX = nodeSize;
+				startRegionY += nodeSize;
+				xCounter = 0;
+			}
+			else {
+				startRegionX += nodeSize;
+			}
+
+			/*Determining the activeness of the node*/
+			boolean isActive = false;
+			ArrayList<Edge> outEdges = input.getOutgoingEdges();
+			for(int i=0; (!isActive)&&i<outEdges.size(); i++){
+				isActive = outEdges.get(i).isActive();
+			}
+			//System.out.println("The node is active: " + isActive);
+			//Note that isActive value not important for input nodes; added for sake of completion
+			
+			/*Determining the alpha value of the node*/
+			double inputValue = input.getInput();
+			float alpha = 0;
+			if(inputValue > 0) {
+				alpha = 1f;
+			}
+			else if(inputValue < 0) {
+				alpha = 0.7f;
+			}
+			//Note: if inputVal == 0, default alpha  value of 0
+			
+			inputLayer.get(input.getID()).setIsActive(isActive);
+			inputLayer.get(input.getID()).setAlpha(alpha);
 		}
-		
+
 		/* Preparing for next set of nodes*/
-		startRegionY = 0;
-		startRegionX += regionSize;
-		
+		startRegionY = nodeSize;
+		startRegionX = (nodeSize * 2) + (nodeSize * numColumns);
+
 		/*
 		 * Create and store hidLayer GNodes
 		 * ===============================
@@ -95,41 +129,60 @@ public class GNetwork{
 		 * Opacity: True if there is at least one incoming edge that is active
 		 */
 		
-		for(Layer<HiddenNode> hLayer : hidLayers){
+		/*x axis spacing between hidden layers*/
+		int middleSectionWidth = totalWidth - ((nodeSize * 4) + (nodeSize * numColumns)) - 30;
+		int x_multiplier = 1;
+		
+		for(Layer<HiddenNode> hLayer : hidLayers){	
+			int equiDistanceX = (middleSectionWidth/(hidLayers.size()*2)) * x_multiplier;
+			int equiDistanceY = 0;
 			ArrayList<HiddenNode> hidNodes = hLayer.getNodeList();
+			
 			for(HiddenNode hidden : hidNodes) {
-				hiddenLayer.put(hidden.getID(), new GNode((Math.random()*regionSize + startRegionX),
-														  Math.random()*totalHeight,
-														  Color.BLUE));
+				/*Creating the initial hidden GNode*/
+				hiddenLayer.put(hidden.getID(), 
+						new GNode((startRegionX + equiDistanceX + 60), (startRegionY + equiDistanceY + 60), Color.BLUE));
+				equiDistanceY += startRegionY;
+				
+				/*Determining the activeness of the node
+				 * AND determining the activeness of the incoming edges of the node*/
 				boolean isActive = false;
 				ArrayList<Edge> inEdges = hidden.getIncomingEdges();
 				for(Edge e : inEdges) {
 					isActive = (isActive == true ? true : e.isActive());				
-					
+
 					int n1ID = e.getNode1().getID();
-					if(inputLayer.containsKey(n1ID)) 
-						networkEdges.put(edgeIndex++, new GEdge(inputLayer.get(n1ID),
-																	hiddenLayer.get(hidden.getID()),
-																	(float) e.getWeight(),
-																	e.isActive()));
-					else if(hiddenLayer.containsKey(n1ID))
-						networkEdges.put(edgeIndex++, new GEdge(hiddenLayer.get(n1ID),
-																	hiddenLayer.get(hidden.getID()),
-																	(float) e.getWeight(),
-																	e.isActive()));
-					else
-						System.out.println("Error: Previous node not stored for hidden node");
-					
+					if(inputLayer.containsKey(n1ID)) { 
+						float alpha = (e.isActive() ? 1f : 0.7f);
+						networkEdges.put(edgeIndex++, 
+								new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
+						
+					}else if(hiddenLayer.containsKey(n1ID)) {
+						float alpha = (e.isActive() ? 1f : 0.7f);
+						networkEdges.put(edgeIndex++, 
+								new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), alpha));
+					}//else
+						//System.out.println("Error: Previous node not stored for hidden node");
 					//System.out.println("The edge is active: " + e.isActive()); //Debug
 				}
 				//System.out.println("The node is active: " + isActive); //Debug
 				hiddenLayer.get(hidden.getID()).setIsActive(isActive);
+				
+				/*Determining the alpha value of the node*/
+				float alpha = 0;
+				if(isActive) 
+					alpha = 1f;
+				else
+					alpha = 0.7f;
+				hiddenLayer.get(hidden.getID()).setAlpha(alpha);
 			}
 			/* Preparing for next set of nodes*/
-			startRegionY = 0;
-			startRegionX += regionSize;
+			startRegionY = nodeSize;
+			x_multiplier++;
 		}
-		
+
+		startRegionY = nodeSize;
+		startRegionX = totalWidth - (nodeSize * 2);
 		/*
 		 * Create and store outLayer GNodes
 		 * ===============================
@@ -137,44 +190,46 @@ public class GNetwork{
 		 * Color: Black
 		 * Opacity: True if there is at least one incoming edge that is active
 		 */
-		
+
 		for(OutputNode output : outLayer) {
-			double newRegionY = 10 + startRegionY;
-			outputLayer.put(output.getID(), new GNode((10 + startRegionX),
-													   newRegionY,
-													   Color.BLACK));
+			/*Creating initial output GNode*/
+			double newRegionY = nodeSize + startRegionY;
+			outputLayer.put(output.getID(), 
+					new GNode(startRegionX, newRegionY,	Color.GREEN));
+			//System.out.println("startregionx = " + startRegionX);
+			startRegionY = newRegionY;
 			
-			startRegionY += newRegionY;
-			
+			/*Determining the activeness of the node
+			 * AND determining the activeness of the incoming edges of the node*/
 			boolean isActive = false;
 			ArrayList<Edge> inEdges = output.getIncomingEdges();
-			System.out.println("Number of incoming edges to output node: " + inEdges.size());
+			//System.out.println("Number of incoming edges to output node: " + inEdges.size());
 			for(Edge e : inEdges) {
 				isActive = (isActive == true ? true : e.isActive());
-				
+
 				int n1ID = e.getNode1().getID();
-				if(inputLayer.containsKey(n1ID)) 
-					networkEdges.put(edgeIndex++, new GEdge(inputLayer.get(n1ID),
-																outputLayer.get(output.getID()),
-																(float) e.getWeight(),
-																e.isActive()));
-				else if(hiddenLayer.containsKey(n1ID)) 
-					networkEdges.put(edgeIndex++, new GEdge(hiddenLayer.get(n1ID),
-																outputLayer.get(output.getID()),
-																(float) e.getWeight(),
-																e.isActive()));
-				else
-					System.out.println("Error: Previous node not stored for output node");
-				
+				if(inputLayer.containsKey(n1ID)) {
+					float alpha = (e.isActive() ? 1f : 0.7f);
+					networkEdges.put(edgeIndex++, 
+							new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
+				}else if(hiddenLayer.containsKey(n1ID)) {
+					float alpha = (e.isActive() ? 1f : 0.7f);
+					networkEdges.put(edgeIndex++, 
+							new GEdge(hiddenLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
+				}//else
+					//System.out.println("Error: Previous node not stored for output node");
 				//System.out.println("The edge " + e.getNode1().getID() + "-" + e.getNode2().getID() + " is active: " + e.isActive()); //Debug
 			}
 			//System.out.println("The node is active: " + isActive); //Debug
 			outputLayer.get(output.getID()).setIsActive(isActive);
+			
+			/*Determining the alpha value of the node*/
+			//System.out.println("The output node is fired: " + output.checkFired());
+			float alpha = (output.checkFired() ? 1f : 0.2f);
+			outputLayer.get(output.getID()).setAlpha(alpha);
 		}
-		
 	}
-	
-	
+
 	/*
 	 * Getters for member variables.
 	 */
@@ -202,6 +257,9 @@ public class GNetwork{
 	public int getTotalHeight() {
 		return totalHeight;
 	}
+	public int getNodeSize() {
+		return nodeSize;
+	}
 
 	/*
 	 * Setters for member variables 
@@ -212,7 +270,6 @@ public class GNetwork{
 	public void setTotalHeight(int h) {
 		totalHeight = h;
 	}
-	
-	
+
 
 }

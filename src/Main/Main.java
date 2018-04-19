@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import ChessAI.ChessSampleTrainer;
 import DKAI.DKSampleTrainer;
 import DKAI.DKTrainer;
 import DKAI.LuaInterface;
@@ -29,10 +30,14 @@ public class Main {
         LI.updateInputs();*/
 		
 		
-		DKSampleTrainer test = new DKSampleTrainer();
+		/*DKSampleTrainer test = new DKSampleTrainer();
+		while(true)
+			test.runGeneration();*/
+		
+		
+		ChessSampleTrainer test = new ChessSampleTrainer();
 		while(true)
 			test.runGeneration();
-		
 		
 		
 		

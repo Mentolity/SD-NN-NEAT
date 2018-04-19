@@ -20,7 +20,8 @@ public class GNode extends JComponent{
 	private double xcoor, ycoor;
 	private Color color;
 	private boolean isActive; 
-
+	private float alpha;
+	
 	/*
 	 * Constructor 
 	 */
@@ -29,6 +30,7 @@ public class GNode extends JComponent{
 		ycoor = y;
 		color = c;
 		isActive = true;
+		alpha = 1;
 	}
 
 	/*
@@ -46,11 +48,17 @@ public class GNode extends JComponent{
 	public boolean getIsActive() {
 		return isActive;
 	}
+	public float getAlpha() {
+		return alpha;
+	}
 	
 	/*
 	 * Setters for member variables 
 	 */
 	public void setIsActive(boolean b) {
 		isActive = b;
+	}
+	public void setAlpha(float a) {
+		alpha = a;
 	}
 }

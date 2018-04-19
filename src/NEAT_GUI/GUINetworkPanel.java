@@ -51,19 +51,14 @@ import java.awt.Color;
 public class GUINetworkPanel extends JPanel{
 
 	private GNetwork gNetwork;
-	
+	private int nodeSize;
 	/*
 	 * Constructor 
 	 */
 	
 	public GUINetworkPanel(){
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		repaint();
-	}
-	
-	public GUINetworkPanel(GNetwork gn){
-		gNetwork = gn;
-		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		setBackground(Color.GRAY);
 		repaint();
 	}
 	
@@ -72,6 +67,7 @@ public class GUINetworkPanel extends JPanel{
 	 */
 	public void setNetwork(GNetwork gn){
 		gNetwork = gn;
+		nodeSize = gn.getNodeSize();
 		setBorder(BorderFactory.createLineBorder(Color.BLACK)); //redundant?
 		repaint();
 	}
@@ -80,23 +76,22 @@ public class GUINetworkPanel extends JPanel{
 	 * Paint method: paints given GNode
 	 */
 	private void paintNode(Graphics2D g2d, GNode n){
-		g2d.setPaint(n.getColor());
+		g2d.setStroke(new BasicStroke(1f));
 		
-		float alpha = 1;
-		if(n.getIsActive()) 
-			alpha = 10 * 0.1f;
-		else
-			alpha = 2 * 0.1f;;
-		
-		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+		/*Paint the node*/
+		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, n.getAlpha());
 		g2d.setComposite(alcom);
-		g2d.fill(new Rectangle2D.Double(n.getXCoor(),
-										n.getYCoor(),
-										10,
-										10));
+		g2d.setPaint(n.getColor());
+		g2d.fill(new Rectangle2D.Double(n.getXCoor(), n.getYCoor(),nodeSize,nodeSize));	
 		
+		/*Draw the grid*/
+		alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f);
+		g2d.setComposite(alcom);
+		g2d.setPaint(Color.BLACK);
+		g2d.draw(new Rectangle2D.Double(n.getXCoor(), n.getYCoor(),nodeSize,nodeSize));
 	}
 	
+
 	/*
 	 * Paint method: paints given GEdge
 	 */
@@ -104,32 +99,19 @@ public class GUINetworkPanel extends JPanel{
 		GNode n1 = c.getStartNode();
 		GNode n2 = c.getEndNode();
 		
-		float alpha = 1;
-		if(c.getIsActive()) 
-			alpha = 10 * 0.1f;
-		else
-			alpha = 2 * 0.1f;;
-		
-		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, c.getAlpha());
 		g2d.setComposite(alcom);
 		
-		if(c.getWeight() > 0)
-			g2d.setColor(Color.WHITE);
-		else
-			g2d.setColor(Color.BLACK);
+		if(c.getWeight() > 0) g2d.setColor(Color.WHITE);
+		else g2d.setColor(Color.BLACK);
 		
-		if(Math.abs(c.getWeight()) < 0.5f)
-			g2d.setStroke(new BasicStroke(0.5f));
-		else if(Math.abs(c.getWeight()) < 1f)
-			g2d.setStroke(new BasicStroke(1f));
-		else
-			g2d.setStroke(new BasicStroke(2f));
+		if(Math.abs(c.getWeight()) < 0.5f) g2d.setStroke(new BasicStroke(0.5f));
+		else if(Math.abs(c.getWeight()) < 1f) g2d.setStroke(new BasicStroke(1f));
+		else g2d.setStroke(new BasicStroke(2f));
 		
-		g2d.draw(new Line2D.Double(n1.getXCoor()+10,
-					n1.getYCoor()+5,
-					n2.getXCoor(),
-				n2.getYCoor()+5));
-		
+		g2d.draw(new Line2D.Double(n1.getXCoor()+(nodeSize/2), n1.getYCoor()+(nodeSize/2), 
+									n2.getXCoor()+(nodeSize/2), n2.getYCoor()+(nodeSize/2))
+				);
 	}
 	
 	/*
@@ -180,14 +162,14 @@ public class GUINetworkPanel extends JPanel{
 				paintNode(g2d, outLayer.get(outKeyIter.next()));
 			}		
 				
-			/* Code for debugging
-			System.out.println("Number of inputNodes: " + inLayer.size());
+			//Code for debugging
+			/*System.out.println("Number of inputNodes: " + inLayer.size());
 			System.out.println("Number of hiddenNodes: " + hidLayers.size());
 			System.out.println("Number of outputNodes: " + outLayer.size());
-			System.out.println("Number of edges: " + netEdges.size());
-			 */
+			System.out.println("Number of edges: " + netEdges.size());*/
+			 
 		}catch(Exception e){
-			System.out.println("Help I'm not working still: " + e);
+			//System.out.println("Help I'm not working still: " + e);
 		}
 	}
 }

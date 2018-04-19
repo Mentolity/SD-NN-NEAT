@@ -2,6 +2,7 @@ package DKAI;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -11,10 +12,11 @@ import javax.swing.SwingUtilities;
 import Evolution.NEAT;
 import Evolution.NEATNetwork;
 import Evolution.Species;
+import Evolution.Store;
 import NEAT_GUI.GUINetworkFrame;
 
 public class DKSampleTrainer extends NEAT{
-	static LuaInterface LI = new LuaInterface("./src/res/LUA.txt", "./src/res/Java.txt");
+	private static LuaInterface LI = new LuaInterface("./src/res/LUA.txt");
 	private GUINetworkFrame GNF;
 	
 	
@@ -25,6 +27,8 @@ public class DKSampleTrainer extends NEAT{
 	private boolean pauseFlag = false;
 	private boolean runSampleGenerationFlag = true;
 	
+	private boolean killFlag = false;
+	
 	double sampleFitnessThreshold = 1.0;
 	
 	public DKSampleTrainer() throws IOException{
@@ -34,6 +38,7 @@ public class DKSampleTrainer extends NEAT{
 			public void run(){
 				try{
 					GNF = new GUINetworkFrame();
+					GNF.addKeyListener(new inputHandler());
 					GNF.setVisible(true);
 				}
 				catch(Exception e){
@@ -45,9 +50,9 @@ public class DKSampleTrainer extends NEAT{
 		System.out.println(LI.getSmallInputs().size());
 		parallelExecution = true;	//initially we can run parallelExecution on sampleFitness		
 		
-		JFrame f = new JFrame();
+		/*JFrame f = new JFrame();
 		f.addKeyListener(new inputHandler());
-		f.setVisible(true);
+		f.setVisible(true);*/
 
 		LI.startNewGame();
 		LI.updateInputs();											//load inputs
@@ -67,6 +72,9 @@ public class DKSampleTrainer extends NEAT{
 
 		int frameCounter = 0;
 		while(LI.deathFlag == 0){
+			//System.out.println(207-LI.position[6]);
+			if(killFlag)				//end the run if killFlag is set
+				break;
 			if(resetFlag){				//reset game if flag is set
 				LI.startNewGame();
 				resetFlag = false;
@@ -137,24 +145,34 @@ public class DKSampleTrainer extends NEAT{
 	Boolean finSample = false;
 	@Override
 	public double fitness(NEATNetwork NN){
-		double maxFitness = 0;
-		for(Species s : population)
-			if(s.getMaxFitness() > maxFitness)
-				maxFitness = s.getMaxFitness();
+		//System.out.println("NUMBER OF HIDDEN LAYERS: " + NN.getHiddenLayers().size());
+		double maxFitness = getMaxFitness();
 		
+		if(maxFitness < sampleFitnessThreshold && runSampleGenerationFlag && parallelExecuteRunningFlag)
+			return sampleFitness(NN);
+		else
+			return gameFitness(NN);
+	}
+	
+	@Override
+	public void updateParallelExecution(){
+		double maxFitness = getMaxFitness();
 		
 		if((maxFitness >= sampleFitnessThreshold && !finSample) || (!runSampleGenerationFlag && !finSample)){
-			System.out.println("PING PING PING ");
+			System.out.println("PING PING PING");
 			//we've finished with the sample so next execution we'll run the game fitness
 			parallelExecution = false;			//running on the emulator so only one execution at a time
 			finSample = true;
 			removeNonMaxSpecies();
 		}
-		
-		if(maxFitness < sampleFitnessThreshold && runSampleGenerationFlag)
-			return sampleFitness(NN);
-		else
-			return gameFitness(NN);
+	}
+	
+	private double getMaxFitness(){
+		double maxFitness = 0;
+		for(Species s : population)
+			if(s.getMaxFitness() > maxFitness)
+				maxFitness = s.getMaxFitness();
+		return maxFitness;
 	}
 	
 	public void removeNonMaxSpecies(){
@@ -180,7 +198,6 @@ public class DKSampleTrainer extends NEAT{
 				e.printStackTrace();
 			}
 		}
-		
 		double fitness = 0;
 		for(int i=0; i<view.size(); i++){	//for each saved frame in view
 			
@@ -209,6 +226,7 @@ public class DKSampleTrainer extends NEAT{
 	
 	
 	public double gameFitness(NEATNetwork NN){
+		System.out.println("NUMBER OF HIDDEN LAYERS: " + NN.getHiddenLayers().size());
 		LI.startNewGame();
 		double fitness = 0;
 		LI.updateInputs();										//load inputs
@@ -226,8 +244,7 @@ public class DKSampleTrainer extends NEAT{
 			}
 			
 			NN.execute();											//execute on input
-			GNF.updateNetwork(NN);
-			
+			GNF.updateNetwork(NN, LI.getViewSize());
 			
 			for(int i=0; i<NN.getOutputNodes().size(); i++){		//set outputs based on fired nodes in output layer
 				
@@ -241,7 +258,7 @@ public class DKSampleTrainer extends NEAT{
 			LI.writeOutputs();										//write outputs to LUA
 			
 			if(LI.position[6] > maxHeight)		//fitness based on max height mario reaches b4 dieing + how quickly he manages to get there
-				maxHeight = 207-LI.position[6];
+				maxHeight = 207-LI.position[6];	//176 is max fitness
 			
 			/*if(lastX != LI.position[5]){
 				timeElapasedSinceLastMove = LI.timer;
@@ -287,7 +304,7 @@ public class DKSampleTrainer extends NEAT{
 			if(key == KeyEvent.VK_Q)				//press "Q" to reset the game while providing user training input
 				resetFlag = true;
 			
-			if(key == KeyEvent.VK_O)				//press "P" to pause training
+			if(key == KeyEvent.VK_O)				//press "O" to pause training
 				pauseFlag = true;
 			
 			if(key == KeyEvent.VK_P)				//press "P" to resume training
@@ -297,7 +314,16 @@ public class DKSampleTrainer extends NEAT{
 				runSampleGenerationFlag = false;
 				System.out.println("ENDING TRAINING GENERATION");
 			}
-				
+			
+			if(key == KeyEvent.VK_E){				//press "E" to kill the run
+				killFlag = true;
+				System.out.println("killFlag set to 1");
+			}
+			
+			if(key == KeyEvent.VK_S){				//press "E" to kill the run
+				Store store = new Store();
+				store.saveNet(getBestNetwork(), new File("./src/res/bestNetwork.network"));
+			}
 		}
 
 		@Override
