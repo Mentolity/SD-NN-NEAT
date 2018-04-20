@@ -88,9 +88,9 @@ public class GUINetworkFrame extends JFrame{
 	
 	public void updateNetwork(NeuralNetwork n, int num){
 		GNetwork gNetwork = new GNetwork(n, num);
-		gNetworks.clear();
 		gNetworks.add(gNetwork);
 		
 		guiNetworkPanel.setNetwork(gNetwork);
 	}
 }
+
