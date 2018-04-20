@@ -36,7 +36,7 @@ public class NEAT implements Serializable{
 	
 	protected static final double MUTATEWEIGHT = 0.80;				//0.8probability of changing a connection weight
 	protected static final double MUTATEWEIGHTTYPE = 0.05;			//probability of mutating uniformly or assigning a random value
-	protected static final double MUTATEADDNODE = 0.25;				//0.01probability of adding a new node
+	protected static final double MUTATEADDNODE = 0.6;				//0.01probability of adding a new node
 	protected static final double MUTATEADDCONNECTION = 0.75;		//0.03probability of adding a new connection between existing nodes
 	
 	protected static final double POPULATIONFROMCROSSOVER = 0.25;	//0.25percentage of the next generations population forming from crossover

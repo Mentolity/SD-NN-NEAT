@@ -140,10 +140,24 @@ public class GNetwork{
 		 * 
 		 * */
 		System.out.println("Number of hidden layers: " + hidLayers.size());
-		int middle = totalWidth - ((nodeSize * 2) + (nodeSize * numColumns) + (nodeSize * 2)) - 30;
-		startRegionX = (nodeSize * 2) + (nodeSize * numColumns) + (middle - (2 * nodeSize * hidLayers.size()))/ 2;
+		int middle = totalWidth - ((nodeSize * 2) + (nodeSize * numColumns) + (nodeSize * 2));
+		startRegionX = (nodeSize) + (nodeSize * numColumns) + (middle - (2 * nodeSize * hidLayers.size()))/ 2;
 		//startRegionX = (nodeSize * 2) + (nodeSize * numColumns);
 		int x_multiplier = 1;
+		
+		/*
+		 * For Y-Axis:
+		 * Figure out which layer has the maximum number nodes
+		 * Have y-axis of node relative to this
+		 * Max height = 2 * nodesize * max nodes
+		 * 
+		 * */
+		int maxHeight = 1;
+		for(Layer<HiddenNode> hLayer : hidLayers) {
+			int layerSize = hLayer.getNodeList().size();
+			maxHeight = (layerSize > maxHeight ? layerSize : maxHeight);
+		}
+			
 		
 		for(Layer<HiddenNode> hLayer : hidLayers){	
 			ArrayList<HiddenNode> hidNodes = hLayer.getNodeList();	
@@ -159,7 +173,9 @@ public class GNetwork{
 			 * 
 			 * */
 			
-			startRegionY = (totalHeight - (2*nodeSize*hidNodes.size()))/2;
+			startRegionY = ((maxHeight * 2 * nodeSize) - (2*nodeSize*hidNodes.size()))/2;
+			//startRegionY = (totalHeight - (2*nodeSize*hidNodes.size()))/2;
+			//startRegionY = nodeSize;
 			int y_multiplier = 1;
 			
 			for(HiddenNode hidden : hidNodes) {
