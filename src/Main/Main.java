@@ -30,14 +30,14 @@ public class Main {
         LI.updateInputs();*/
 		
 		
-		/*DKSampleTrainer test = new DKSampleTrainer();
-		while(true)
-			test.runGeneration();*/
-		
-		
-		ChessSampleTrainer test = new ChessSampleTrainer();
+		DKSampleTrainer test = new DKSampleTrainer();
 		while(true)
 			test.runGeneration();
+		
+		
+		/*ChessSampleTrainer test = new ChessSampleTrainer();
+		while(true)
+			test.runGeneration();*/
 		
 		
 		

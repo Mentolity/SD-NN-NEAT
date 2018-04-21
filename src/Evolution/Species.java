@@ -90,9 +90,14 @@ public class Species implements Serializable{
 	}
 	
 	public void updateMaxFitness(){
-		for(NEATNetwork NN : population)
-			if(maxFitness < NN.getCurrentFitness())
-				maxFitness = NN.getCurrentFitness();
+		double tempMaxFitness = -Double.MAX_VALUE;
+		for(NEATNetwork NN : population){
+			//System.out.println("ID: " + NN + "NN CURRENT FITNESS WHILE UPDATEING: " + NN.getCurrentFitness());
+			if(tempMaxFitness < NN.getCurrentFitness())
+				tempMaxFitness = NN.getCurrentFitness();
+		}
+		maxFitness = tempMaxFitness;
+		//System.out.println("maxFitness: " + maxFitness);
 	}
 	
 	public ArrayList<NEATNetwork> getPopulation(){

@@ -141,10 +141,6 @@ public class GUINetworkPanel extends JPanel{
 			hidKeyIter = hidLayers.keySet().iterator();
 			outKeyIter = outLayer.keySet().iterator();
 			edgeKeyIter = netEdges.keySet().iterator();
-			//Paint edges
-			while(edgeKeyIter.hasNext()) {
-				paintEdge(g2d, netEdges.get(edgeKeyIter.next()));
-			}
 			
 			//Paint input nodes
 			while(inKeyIter.hasNext()) {
@@ -161,6 +157,11 @@ public class GUINetworkPanel extends JPanel{
 			while(outKeyIter.hasNext()) {
 				paintNode(g2d, outLayer.get(outKeyIter.next()));
 			}		
+			
+			//Paint edges
+			while(edgeKeyIter.hasNext()) {
+				paintEdge(g2d, netEdges.get(edgeKeyIter.next()));
+			}
 				
 			//Code for debugging
 			/*System.out.println("Number of inputNodes: " + inLayer.size());

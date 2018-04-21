@@ -13,7 +13,7 @@ import NeuralNetwork.OutputNode;
 
 public class NEAT implements Serializable{
 	private static final long serialVersionUID = 7656062492809526801L;
-	/*protected static final double MUTATEWEIGHT = 0.80;				//0.8probability of changing a connection weight
+	protected static final double MUTATEWEIGHT = 0.80;				//0.8probability of changing a connection weight
 	protected static final double MUTATEWEIGHTTYPE = 0.05;			//probability of mutating uniformly or assigning a random value
 	protected static final double MUTATEADDNODE = 0.035;				//0.01probability of adding a new node
 	protected static final double MUTATEADDCONNECTION = 0.5;		//0.03probability of adding a new connection between existing nodes
@@ -24,27 +24,6 @@ public class NEAT implements Serializable{
 	
 	protected static final int MAXSTAGNENTGENERATIONS =	750;
 	
-	protected static final int POPULATIONSIZE = 20;
-	protected static final int MINIMUMSPECIESSIZE = 5;
-	protected static final int MINNUMBEROFSPECIES = 4;
-	protected static final int MAXNUMBEROFSPECIES = 10;
-	protected static final int REPLACESTAGNANTWITHPROTOFACTOR = 5;	//Rate multipler for when to add new species when all are stagnant
-	
-	protected static final double POPULATIONELIMINATION = 0.75;
-	
-	protected static final double STEP = 0.025;*/
-	
-	protected static final double MUTATEWEIGHT = 0.80;				//0.8probability of changing a connection weight
-	protected static final double MUTATEWEIGHTTYPE = 0.05;			//probability of mutating uniformly or assigning a random value
-	protected static final double MUTATEADDNODE = 0.25;				//0.01probability of adding a new node
-	protected static final double MUTATEADDCONNECTION = 0.75;		//0.03probability of adding a new connection between existing nodes
-	
-	protected static final double POPULATIONFROMCROSSOVER = 0.25;	//0.25percentage of the next generations population forming from crossover
-	protected static final double MAINTAINDISBALEGENE = 0.75;		//probability that an inherited gene is disabled if it was disabled in either parent
-	protected static final double INTERSPECIESMATINGRATE = 0.005;	//probability that two different species mate	
-	
-	protected static final int MAXSTAGNENTGENERATIONS =	25;
-	
 	protected static final int POPULATIONSIZE = 100;
 	protected static final int MINIMUMSPECIESSIZE = 5;
 	protected static final int MINNUMBEROFSPECIES = 4;
@@ -54,6 +33,27 @@ public class NEAT implements Serializable{
 	protected static final double POPULATIONELIMINATION = 0.75;
 	
 	protected static final double STEP = 0.025;
+	
+	/*protected static final double MUTATEWEIGHT = 0.80;				//0.8probability of changing a connection weight
+	protected static final double MUTATEWEIGHTTYPE = 0.05;			//probability of mutating uniformly or assigning a random value
+	protected static final double MUTATEADDNODE = 0.05;				//0.01probability of adding a new node
+	protected static final double MUTATEADDCONNECTION = 0.5;		//0.03probability of adding a new connection between existing nodes
+	
+	protected static final double POPULATIONFROMCROSSOVER = 0.25;	//0.25percentage of the next generations population forming from crossover
+	protected static final double MAINTAINDISBALEGENE = 0.75;		//probability that an inherited gene is disabled if it was disabled in either parent
+	protected static final double INTERSPECIESMATINGRATE = 0.005;	//probability that two different species mate	
+	
+	protected static final int MAXSTAGNENTGENERATIONS =	250;
+	
+	protected static final int POPULATIONSIZE = 100;
+	protected static final int MINIMUMSPECIESSIZE = 5;
+	protected static final int MINNUMBEROFSPECIES = 4;
+	protected static final int MAXNUMBEROFSPECIES = 10;
+	protected static final int REPLACESTAGNANTWITHPROTOFACTOR = 100;	//Rate multipler for when to add new species when all are stagnant
+	
+	protected static final double POPULATIONELIMINATION = 0.75;
+	
+	protected static final double STEP = 0.025;*/
 
 	protected int numInputNodes;
 	protected int numOutputNodes;
@@ -348,16 +348,16 @@ public class NEAT implements Serializable{
 		for(Species s : population){																	//update stagnant count for each species
 			Boolean reset = false;
 			for(NEATNetwork NN : s.getPopulation()){
-
-				System.out.println("NUMBER OF HIDDEN LAYERS: " + NN.getHiddenLayers().size());
+				//System.out.println("NUMBER OF HIDDEN LAYERS: " + NN.getHiddenLayers().size());
 				if(NN.getCurrentFitness() > s.getMaxFitness()){
 					s.resetGenerationsWithoutImprovement();
-					s.updateMaxFitness();																//update the species max fitness
 					reset = true;
 				}
 			}
 			if(!reset)																					//if the generations w/o improvement counter wasn't reset increment it
 				s.incGenerationsWithoutImprovement();
+			//System.out.println("SPECIES ID: " + s);
+			s.updateMaxFitness();																		//update the species max fitness
 		}
 		
 		
