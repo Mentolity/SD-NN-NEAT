@@ -92,4 +92,9 @@ public class GUINetworkFrame extends JFrame{
 		
 		guiNetworkPanel.setNetwork(gNetwork);
 	}
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> c0f2ce810c68ac8bff8a18659bfdb00e0e9ce1f1

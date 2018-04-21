@@ -161,6 +161,7 @@ public class GNetwork{
 		 * ***leave some  space for the give
 		 * 
 		 * */
+<<<<<<< HEAD
 		//System.out.println("Number of hidden layers: " + hidLayers.size());
 		int middle = totalWidth - ((nodeSize * 2) + (nodeSize * numColumns) + (nodeSize * 2));
 		int emptyLayerCount = 0;
@@ -169,6 +170,11 @@ public class GNetwork{
 				emptyLayerCount++;	
 		}
 		startRegionX = (nodeSize) + (nodeSize * numColumns) + (middle - (2 * nodeSize * (hidLayers.size()-emptyLayerCount)))/ 2;
+=======
+		System.out.println("Number of hidden layers: " + hidLayers.size());
+		int middle = totalWidth - ((nodeSize * 2) + (nodeSize * numColumns) + (nodeSize * 2));
+		startRegionX = (nodeSize) + (nodeSize * numColumns) + (middle - (2 * nodeSize * hidLayers.size()))/ 2;
+>>>>>>> c0f2ce810c68ac8bff8a18659bfdb00e0e9ce1f1
 		//startRegionX = (nodeSize * 2) + (nodeSize * numColumns);
 		int x_multiplier = 1;
 		
@@ -188,9 +194,13 @@ public class GNetwork{
 		
 		for(Layer<HiddenNode> hLayer : hidLayers){	
 			ArrayList<HiddenNode> hidNodes = hLayer.getNodeList();	
+<<<<<<< HEAD
 			
 			
 			//System.out.println("Number of hidden nodes: " + hidNodes.size());
+=======
+			System.out.println("Number of hidden nodes: " + hidNodes.size());
+>>>>>>> c0f2ce810c68ac8bff8a18659bfdb00e0e9ce1f1
 			/*
 			 * Figuring our the starting positions of the hidden nodes:
 			 * 
@@ -209,7 +219,11 @@ public class GNetwork{
 			
 			for(HiddenNode hidden : hidNodes) {
 				/*Creating the initial hidden GNode*/
+<<<<<<< HEAD
 				//System.out.println("Placing node at: (" + (startRegionX + equiDistance) + "," + (startRegionY + equiDistance) + ")");
+=======
+				System.out.println("Placing node at: (" + (startRegionX + equiDistance) + "," + (startRegionY + equiDistance) + ")");
+>>>>>>> c0f2ce810c68ac8bff8a18659bfdb00e0e9ce1f1
 				hiddenLayer.put(hidden.getID(), 
 						new GNode((startRegionX + equiDistance * x_multiplier), (startRegionY + equiDistance * y_multiplier), Color.BLUE));
 				y_multiplier++;
@@ -231,8 +245,8 @@ public class GNetwork{
 						float alpha = (e.isActive() ? 1f : 0.7f);
 						networkEdges.put(edgeIndex++, 
 								new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), alpha));
-					}//else
-						//System.out.println("Error: Previous node not stored for hidden node");
+					}else
+						System.out.println("Error: Previous node not stored for hidden node");
 					//System.out.println("The edge is active: " + e.isActive()); //Debug
 				}
 				//System.out.println("The node is active: " + isActive); //Debug
@@ -246,8 +260,12 @@ public class GNetwork{
 					alpha = TRANS;
 				hiddenLayer.get(hidden.getID()).setAlpha(alpha);
 			}
+<<<<<<< HEAD
 			if(hidNodes.size() > 0)
 				x_multiplier++;
+=======
+			x_multiplier++;
+>>>>>>> c0f2ce810c68ac8bff8a18659bfdb00e0e9ce1f1
 		}
 
 		startRegionY = nodeSize;
@@ -272,7 +290,7 @@ public class GNetwork{
 			 * AND determining the activeness of the incoming edges of the node*/
 			boolean isActive = false;
 			ArrayList<Edge> inEdges = output.getIncomingEdges();
-			//System.out.println("Number of incoming edges to output node: " + inEdges.size());
+			System.out.println("Number of incoming edges to output node: " + inEdges.size());
 			for(Edge e : inEdges) {
 				isActive = (isActive == true ? true : e.isActive());
 
@@ -285,16 +303,21 @@ public class GNetwork{
 					float alpha = (e.isActive() ? 1f : 0.7f);
 					networkEdges.put(edgeIndex++, 
 							new GEdge(hiddenLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
-				}//else
-					//System.out.println("Error: Previous node not stored for output node");
+				}else
+					System.out.println("Error: Previous node not stored for output node");
 				//System.out.println("The edge " + e.getNode1().getID() + "-" + e.getNode2().getID() + " is active: " + e.isActive()); //Debug
 			}
 			//System.out.println("The node is active: " + isActive); //Debug
 			outputLayer.get(output.getID()).setIsActive(isActive);
 			
 			/*Determining the alpha value of the node*/
+<<<<<<< HEAD
 			//System.out.println("The output node is fired: " + output.checkFired());
 			float alpha = (output.checkFired() ? 1f : TRANS);
+=======
+			System.out.println("The output node is fired: " + output.checkFired());
+			float alpha = (output.checkFired() ? 1f : 0.2f);
+>>>>>>> c0f2ce810c68ac8bff8a18659bfdb00e0e9ce1f1
 			outputLayer.get(output.getID()).setAlpha(alpha);
 		}
 	}

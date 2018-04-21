@@ -164,13 +164,13 @@ public class GUINetworkPanel extends JPanel{
 			}
 				
 			//Code for debugging
-			/*System.out.println("Number of inputNodes: " + inLayer.size());
+			System.out.println("Number of inputNodes: " + inLayer.size());
 			System.out.println("Number of hiddenNodes: " + hidLayers.size());
 			System.out.println("Number of outputNodes: " + outLayer.size());
-			System.out.println("Number of edges: " + netEdges.size());*/
+			System.out.println("Number of edges: " + netEdges.size());
 			 
 		}catch(Exception e){
-			//System.out.println("Help I'm not working still: " + e);
+			System.out.println("Help I'm not working still: " + e);
 		}
 	}
 }
