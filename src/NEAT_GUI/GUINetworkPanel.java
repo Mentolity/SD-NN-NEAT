@@ -100,6 +100,7 @@ public class GUINetworkPanel extends JPanel{
 		GNode n2 = c.getEndNode();
 		
 		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, c.getAlpha());
+		//System.out.println("The alpha value is " + c.getAlpha());
 		g2d.setComposite(alcom);
 		
 		if(c.getWeight() > 0) g2d.setColor(Color.WHITE);
