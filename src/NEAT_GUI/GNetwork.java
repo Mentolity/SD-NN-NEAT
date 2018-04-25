@@ -25,7 +25,7 @@ public class GNetwork{
 
 	private int totalWidth;
 	private int totalHeight;
-	private int nodeSize;
+	private double nodeSize, hidNodeSize;
 	private int numColumns;
 	/*
 	 * Constructor
@@ -138,79 +138,81 @@ public class GNetwork{
 		/*
 		 * Create and store hidLayer GNodes
 		 * ===============================
-		 * Position: Middle of the panel, scattered
+		 * Position: Middle of the panel, centered
 		 * Color: Blue
 		 * Opacity: True if there is at least one incoming edge that is active
 		 */
 		
-		int equiDistance = 2 * nodeSize;
-		
-		/*Figuring out the starting positions of the hidden layers:
-		 *
-		 * totalwidth = inputlayer region + outputlayer region + hiddenlayer region
-		 * totalwidth = inputlayer region + outputlayer region + 2(nodesize)*number of hidden layers
-		 * 
-		 * hiddenlayer region = totalwith - inputlayer region - outputlayer region
-		 * hiddenlayer region = 2(nodeszie)*numebr of hidden layers
-		 * 
-		 * ***leave some  space for the give
-		 * 
-		 * */
-		//System.out.println("Number of hidden layers: " + hidLayers.size());
-		int middle = totalWidth - ((nodeSize * 2) + (nodeSize * numColumns) + (nodeSize * 2));
+		hidNodeSize = nodeSize;
+		double equiDistance = 2 * nodeSize;
+		double middle = totalWidth - ((nodeSize * 2) + (nodeSize * numColumns) + (nodeSize * 2));	//hiddenlayer region = totalwidth - inputlayer region - outputlayer region
+		/*For X-axis, determine number of layers by subtracting the total from the number of empty layers*/
 		int emptyLayerCount = 0;
 		for(Layer<HiddenNode> l : hidLayers){
 			if(l.getNodeList().size() == 0)
 				emptyLayerCount++;	
 		}
-		startRegionX = (nodeSize) + (nodeSize * numColumns) + (middle - (2 * nodeSize * (hidLayers.size()-emptyLayerCount)))/ 2;
-		//startRegionX = (nodeSize * 2) + (nodeSize * numColumns);
-		int x_multiplier = 1;
-		
-		/*
-		 * For Y-Axis:
-		 * Figure out which layer has the maximum number nodes
-		 * Have y-axis of node relative to this
-		 * Max height = 2 * nodesize * max nodes
-		 * 
-		 * */
+		int numNonEmptyLayers = hidLayers.size()-emptyLayerCount;
+		/*For the Y-axis, nodes centered with respect to deepest depth*/
 		int maxHeight = 1;
 		for(Layer<HiddenNode> hLayer : hidLayers) {
 			int layerSize = hLayer.getNodeList().size();
 			maxHeight = (layerSize > maxHeight ? layerSize : maxHeight);
 		}
-			
 		
+		/*
+		 * Determine whether the hidden nodes will fit into the middle region
+		 */		
+		
+		/*Checking X-axis*/
+		if((numNonEmptyLayers * equiDistance) > middle) {
+			equiDistance = middle/numNonEmptyLayers;
+			hidNodeSize = equiDistance/2;
+		} 
+		/*Checking Y-axis*/
+		if((maxHeight * equiDistance) > totalHeight) {
+			double newEquiDistance = totalHeight/maxHeight;
+			equiDistance = (newEquiDistance < equiDistance ? newEquiDistance : equiDistance);
+			hidNodeSize = equiDistance / 2;
+		}
+		
+		/*
+		 * Figuring out the starting positions of the hidden layers:
+		 *
+		 * totalwidth = inputlayer region + outputlayer region + hiddenlayer region
+		 * hiddenlayer region = 2*nodesize*number of nonempty hidden layers
+		 * 
+		 * starting x-position = space + inputlayer region + hiddenlayer region shifted to the left
+		 *
+		 */
+		startRegionX = (nodeSize) + (nodeSize * numColumns) + (middle - (2 * hidNodeSize * numNonEmptyLayers))/ 2;
+		int x_multiplier = 1;
+				
 		for(Layer<HiddenNode> hLayer : hidLayers){	
 			ArrayList<HiddenNode> hidNodes = hLayer.getNodeList();	
 			
-			
-			//System.out.println("Number of hidden nodes: " + hidNodes.size());
 			/*
-			 * Figuring our the starting positions of the hidden nodes:
+			 * Figuring out the starting positions of the hidden nodes:
 			 * 
 			 * totalheight = 2y + 2*nodesize*number of nodes in the layer
 			 * where y is the distance between the frame and the first (and last) node
-			 * Note that sytarting region dependednt on number of nodes per layer
+			 * Note that starting region dependent on number of nodes per layer
 			 * 
 			 * y = (totalheight - 2*nodesize*number of nodes in the layer) 2
 			 * 
 			 * */
 			
-			startRegionY = ((maxHeight * 2 * nodeSize) - (2*nodeSize*hidNodes.size()))/2;
-			//startRegionY = (totalHeight - (2*nodeSize*hidNodes.size()))/2;
-			//startRegionY = nodeSize;
+			startRegionY = ((maxHeight * 2 * hidNodeSize) - (2*hidNodeSize*hidNodes.size()))/2;
 			int y_multiplier = 1;
 			
 			for(HiddenNode hidden : hidNodes) {
 				/*Creating the initial hidden GNode*/
-				//System.out.println("Placing node at: (" + (startRegionX + equiDistance) + "," + (startRegionY + equiDistance) + ")");
 				hiddenLayer.put(hidden.getID(), 
 						new GNode((startRegionX + equiDistance * x_multiplier), (startRegionY + equiDistance * y_multiplier), Color.BLUE));
+				//System.out.println("Placing node at: (" + (startRegionX + equiDistance) + "," + (startRegionY + equiDistance) + ")");
 				y_multiplier++;
 				
-				/*Determining the activeness of the node
-				 * AND determining the activeness of the incoming edges of the node*/
+				/*Determining the activeness of the node AND determining the activeness of the incoming edges of the node*/
 				boolean isActive = false;
 				ArrayList<Edge> inEdges = hidden.getIncomingEdges();
 				for(Edge e : inEdges) {
@@ -222,7 +224,7 @@ public class GNetwork{
 						if(inputLayer.get(n1ID).getIsActive()) {
 							alpha = (e.isActive() ? 1f : 0.7f);
 						} else {
-							alpha = 0f;
+							alpha = 0;
 						}
 						networkEdges.put(edgeIndex++,  
 								new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
@@ -230,8 +232,8 @@ public class GNetwork{
 						float alpha = (e.isActive() ? 1f : 0.7f);
 						networkEdges.put(edgeIndex++, 
 								new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), alpha));
-					}//else
-						//System.out.println("Error: Previous node not stored for hidden node");
+					}
+					//System.out.println("Error: Previous node not stored for hidden node");
 					//System.out.println("The edge is active: " + e.isActive()); //Debug
 				}
 				//System.out.println("The node is active: " + isActive); //Debug
@@ -248,7 +250,7 @@ public class GNetwork{
 			if(hidNodes.size() > 0)
 				x_multiplier++;
 		}
-
+		
 		startRegionY = nodeSize;
 		startRegionX = totalWidth - (nodeSize * 2);
 		/*
@@ -331,8 +333,11 @@ public class GNetwork{
 	public int getTotalHeight() {
 		return totalHeight;
 	}
-	public int getNodeSize() {
+	public double getNodeSize() {
 		return nodeSize;
+	}
+	public double getHidNodeSize() {
+		return hidNodeSize;
 	}
 
 	/*
@@ -344,6 +349,4 @@ public class GNetwork{
 	public void setTotalHeight(int h) {
 		totalHeight = h;
 	}
-
-
 }

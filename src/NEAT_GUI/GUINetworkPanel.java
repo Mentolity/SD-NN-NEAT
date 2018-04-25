@@ -51,7 +51,7 @@ import java.awt.Color;
 public class GUINetworkPanel extends JPanel{
 
 	private GNetwork gNetwork;
-	private int nodeSize;
+	private double nodeSize;
 	/*
 	 * Constructor 
 	 */
@@ -150,11 +150,13 @@ public class GUINetworkPanel extends JPanel{
 			
 
 			//Paint hidden nodes per hidden layer
+			nodeSize = gNetwork.getHidNodeSize();
 			while(hidKeyIter.hasNext()) {
 				paintNode(g2d, hidLayers.get(hidKeyIter.next()));
 			}
 
 			//Paint output nodes
+			nodeSize = gNetwork.getNodeSize();
 			while(outKeyIter.hasNext()) {
 				paintNode(g2d, outLayer.get(outKeyIter.next()));
 			}		
