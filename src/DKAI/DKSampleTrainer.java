@@ -246,7 +246,14 @@ public class DKSampleTrainer extends NEAT implements Serializable{
 		int timeElapasedSinceLastMove = LI.timer;
 		int lastX = LI.position[5];
 		
+		Store store = new Store();
+		
 		while(LI.deathFlag == 0){									//keep running until death
+			if(saveCurrentNetworkFlag){
+				store.saveNet(NN, new File("./src/res/SAVED-NETWORK.network"));
+				saveCurrentNetworkFlag = false;
+			}
+			
 			if(killFlag){				//end the run if killFlag is set
 				killFlag = false;
 				break;
@@ -293,6 +300,7 @@ public class DKSampleTrainer extends NEAT implements Serializable{
 		return fitness;
 	}
 	
+	private boolean saveCurrentNetworkFlag = false;
 	private class inputHandler implements KeyListener{
 		@Override
 		public void keyTyped(KeyEvent e){
@@ -338,6 +346,10 @@ public class DKSampleTrainer extends NEAT implements Serializable{
 			if(key == KeyEvent.VK_S){				//press "E" to kill the run
 				System.out.println("Save Flag Set. Save will be executed at the end of this Generation.");
 				saveFlag = true;
+			}
+			if(key == KeyEvent.VK_X){				//press "E" to kill the run
+				System.out.println("Saving Current Network.");
+				saveCurrentNetworkFlag = true;
 			}
 			if(key == KeyEvent.VK_D){				//press "E" to kill the run
 				System.out.println("Load Flag Set.");

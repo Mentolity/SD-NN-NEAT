@@ -330,6 +330,8 @@ while true do
 		if(str:sub(5,5) == "1") then			--run at 4-frames per write
 			x = 0
 			if str:sub(10,10) == "1" then		--if up is pressed
+				--print("x: " .. position[4]["x"])
+				--print("y: " .. position[4]["y"])
 				if (position[4]["x"] <= 152 and position[4]["y"] == 57) then
 					--print("x: " .. position[4]["x"])
 					--print("y: " .. position[4]["y"])
@@ -341,6 +343,29 @@ while true do
 					controller["P1 Down"] = false
 					controller["P1 Left"] = true
 					controller["P1 Right"] = false
+					controller["P1 A"] = false
+					controller["P1 B"] = false
+					for i=x,1,-1 do
+						joypad.set(controller)
+						emu.frameadvance()
+					end
+					controller["P1 Up"] = true
+					controller["P1 Down"] = false
+					controller["P1 Left"] = false
+					controller["P1 Right"] = false
+					controller["P1 A"] = false
+					controller["P1 B"] = false
+				end
+				
+				--print("xTruth: " .. position[4]["x"] >= 199)
+				--print("yTruth: " .. position[4]["y"] == 83)
+				if (position[4]["x"] >= 199 and position[4]["y"] == 83) then
+					x = 202 - position[4]["x"]
+					print("xDif: " .. x)
+					controller["P1 Up"] = false
+					controller["P1 Down"] = false
+					controller["P1 Left"] = false
+					controller["P1 Right"] = true
 					controller["P1 A"] = false
 					controller["P1 B"] = false
 					for i=x,1,-1 do

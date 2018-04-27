@@ -9,6 +9,7 @@ import DKAI.DKSampleTrainer;
 import DKAI.DKTrainer;
 import DKAI.LuaInterface;
 import Evolution.NEAT;
+import Evolution.NEATNetwork;
 import Evolution.Store;
 import ImageCategorizer.ImageProcessor;
 import ImageCategorizer.ImageTrainer;
@@ -33,7 +34,7 @@ public class Main {
 
 		Store store = new Store();
 		//DKSampleTrainer test = new DKSampleTrainer();
-		DKSampleTrainer test = (DKSampleTrainer)store.loadNEAT(new File("./src/res/NEAT-CleanRun2.network"));
+		DKSampleTrainer test = (DKSampleTrainer)store.loadNEAT(new File("./src/res/NEAT-9693877551020408-2.network"));
 		test.initializeGUI();
 		
 		while(true){
@@ -44,6 +45,9 @@ public class Main {
 				System.out.println("SAVED NEAT");
 			}
 		}
+		
+		/*NEATNetwork NN = store.loadNet(new File("./src/res/WINNING_NETWORK.network"));
+		test.gameFitness(NN);*/
 		
 		/*ChessSampleTrainer test = new ChessSampleTrainer();
 		while(true)

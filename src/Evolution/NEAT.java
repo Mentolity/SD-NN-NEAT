@@ -32,19 +32,19 @@ public class NEAT implements Serializable{
 	
 	/*protected static final double MUTATEWEIGHT = 0.80;				//0.8probability of changing a connection weight
 	protected static final double MUTATEWEIGHTTYPE = 0.05;			//probability of mutating uniformly or assigning a random value
-	protected static final double MUTATEADDNODE = 0.05;				//0.01probability of adding a new node
-	protected static final double MUTATEADDCONNECTION = 0.5;		//0.03probability of adding a new connection between existing nodes
+	protected static final double MUTATEADDNODE = 0.5;				//0.01probability of adding a new node
+	protected static final double MUTATEADDCONNECTION = 0.8;		//0.03probability of adding a new connection between existing nodes
 	
 	protected static final double POPULATIONFROMCROSSOVER = 0.25;	//0.25percentage of the next generations population forming from crossover
 	protected static final double MAINTAINDISBALEGENE = 0.75;		//probability that an inherited gene is disabled if it was disabled in either parent
 	protected static final double INTERSPECIESMATINGRATE = 0.005;	//probability that two different species mate	
 	
-	protected static final int MAXSTAGNENTGENERATIONS =	250;
+	protected static final int MAXSTAGNENTGENERATIONS =	35;
 	
-	protected static final int POPULATIONSIZE = 100;
-	protected static final int MINIMUMSPECIESSIZE = 5;
-	protected static final int MINNUMBEROFSPECIES = 4;
-	protected static final int MAXNUMBEROFSPECIES = 10;
+	protected static final int POPULATIONSIZE = 40;
+	protected static final int MINIMUMSPECIESSIZE = 2;
+	protected static final int MINNUMBEROFSPECIES = 2;
+	protected static final int MAXNUMBEROFSPECIES = 5;
 	protected static final int REPLACESTAGNANTWITHPROTOFACTOR = 100;	//Rate multipler for when to add new species when all are stagnant
 	
 	protected static final double POPULATIONELIMINATION = 0.75;

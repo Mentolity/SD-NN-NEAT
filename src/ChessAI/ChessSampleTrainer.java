@@ -133,7 +133,7 @@ public class ChessSampleTrainer extends NEAT implements Serializable{
 			}
 //						MoveListSimulation = game.GenerateInput(CurrentPlayer);
 
-			//NewGame.RandomizeAvailChess(CurrentPlayer);
+			NewGame.RandomizeAvailChess(CurrentPlayer);
 			AvailChess = NewGame.GetAvailChess(CurrentPlayer);
 			Boolean moveTaken = false;
 			
@@ -349,7 +349,8 @@ public class ChessSampleTrainer extends NEAT implements Serializable{
 		double currentFitness = NN.getCurrentFitness();
 		int generationsAlive = NN.getGenerationsAlive();
 		NN.incGenerationsAlive();
-		return ((currentFitness*(generationsAlive-1))/generationsAlive)+fitness/generationsAlive; //running average of fitness over all generations
+		//return ((currentFitness*(generationsAlive-1))/generationsAlive)+fitness/generationsAlive; //running average of fitness over all generations
+		return fitness;
 	}
 
 	private class inputHandler implements KeyListener{

@@ -826,7 +826,7 @@ public class GameSimulator {
 		else {
 			availChess = P2AvailChess;
 		}
-		for (int i=0; i<8;i++) {
+		for (int i=0; i<16;i++) {
 			if ((availChess[i][0] == ChessOrgX) && (availChess[i][1] == ChessOrgY)) {
 				availChess[i][0] = ChessDesX;
 				availChess[i][1] = ChessDesY;
