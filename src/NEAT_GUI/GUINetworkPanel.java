@@ -54,7 +54,6 @@ public class GUINetworkPanel extends JPanel implements Serializable{
 
 	private GNetwork gNetwork;
 	private double nodeSize;
-	private int count_disabled, count_enabled;
 	/*
 	 * Constructor 
 	 */
@@ -102,11 +101,6 @@ public class GUINetworkPanel extends JPanel implements Serializable{
 		GNode n1 = c.getStartNode();
 		GNode n2 = c.getEndNode();
 		
-		if (c.getAlpha() == 0)
-			count_disabled++;
-		else
-			count_enabled++;
-		
 		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, c.getAlpha());
 		//System.out.println("The alpha value is " + c.getAlpha());
 		g2d.setComposite(alcom);
@@ -119,8 +113,7 @@ public class GUINetworkPanel extends JPanel implements Serializable{
 		else g2d.setStroke(new BasicStroke(2f));
 		
 		g2d.draw(new Line2D.Double(n1.getXCoor()+(nodeSize/2), n1.getYCoor()+(nodeSize/2), 
-									n2.getXCoor()+(nodeSize/2), n2.getYCoor()+(nodeSize/2))
-				);
+									n2.getXCoor()+(nodeSize/2), n2.getYCoor()+(nodeSize/2)));
 	}
 	
 	/*
@@ -151,6 +144,8 @@ public class GUINetworkPanel extends JPanel implements Serializable{
 			outKeyIter = outLayer.keySet().iterator();
 			edgeKeyIter = netEdges.keySet().iterator();
 			
+			
+			
 			//Paint input nodes
 			while(inKeyIter.hasNext()) {
 				paintNode(g2d, inLayer.get(inKeyIter.next()));
@@ -173,10 +168,6 @@ public class GUINetworkPanel extends JPanel implements Serializable{
 			while(edgeKeyIter.hasNext()) {
 				paintEdge(g2d, netEdges.get(edgeKeyIter.next()));
 			}
-			
-			System.out.println(netEdges.size() + " total edges");
-			System.out.println(count_disabled + " disabled edges");
-			System.out.println(count_enabled + " enabled edges");
 			
 			//Code for debugging
 			/*System.out.println("Number of inputNodes: " + inLayer.size());

@@ -227,33 +227,42 @@ public class GNetwork implements Serializable{
 						isActive = true;
 					
 					/*Create the incoming GEdge*/
-					
 					int n1ID = e.getNode1().getID(); //getting the node previous to hidden
-					if(!e.isEnabled()) { //if edge not enabled, do not display (invisible)
-						networkEdges.put(edgeIndex++,  
-								new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),0));
-					} else { //otherwise the edge is enabled and will be displayed
-						if(inputLayer.containsKey(n1ID)) { 
+					 //otherwise the edge is enabled and will be displayed
+					if(inputLayer.containsKey(n1ID)) {
+						if(e.isEnabled()) {
 							/*Only show the edge as opaque if the input node is active*/
 							float alpha;
 							if(inputLayer.get(n1ID).getIsActive()) {
 								alpha = (e.isActive() ? 1f : TRANS); //opaque if edge is active; transparent otherwise
 								networkEdges.put(edgeIndex++,  
-									new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
+									new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));								
 							}else {
 								alpha = TRANS; //transparent if input node has value of 0
 								networkEdges.put(edgeIndex++,  
 										new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
 							}
-						}else if(hiddenLayer.containsKey(n1ID)) {
+						} else {
+							networkEdges.put(edgeIndex++,  
+									new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	0));
+						}						
+					} else if(hiddenLayer.containsKey(n1ID)) {
+						if(e.isEnabled()) {
 							float alpha = (e.isActive() ? 1f : TRANS);
 							networkEdges.put(edgeIndex++, 
 									new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), alpha));
+						} else {
+							networkEdges.put(edgeIndex++, 
+									new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), 0));
 						}
-						//System.out.println("Error: Previous node not stored for hidden node");
-						//System.out.println("The edge is active: " + e.isActive()); //Debug	
+						
+					} else {
+						System.out.println("Error: cannot calculate incomin edge's origin");
 					}
+					//System.out.println("Error: Previous node not stored for hidden node");
+					//System.out.println("The edge is active: " + e.isActive()); //Debug	
 				}
+				
 				//System.out.println("The node is active: " + isActive); //Debug
 				hiddenLayer.get(hidden.getID()).setIsActive(isActive);
 				
@@ -294,11 +303,8 @@ public class GNetwork implements Serializable{
 			for(Edge e : inEdges) {
 				/*Create the incoming GEdge*/
 				int n1ID = e.getNode1().getID();
-				if(!e.isEnabled()) {
-					networkEdges.put(edgeIndex++, 
-							new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), 0));
-				} else {
-					if(inputLayer.containsKey(n1ID)) { 
+				if(inputLayer.containsKey(n1ID)) { 
+					if(e.isEnabled()) {
 						/*Only show the edge if the input node is active*/
 						float alpha;
 						if(inputLayer.get(n1ID).getIsActive()) {
@@ -312,19 +318,29 @@ public class GNetwork implements Serializable{
 						}
 						//debug_edgeCounter++;
 						//System.out.println("Alpha value " + alpha);
-					}else if(hiddenLayer.containsKey(n1ID)) {
+					} else {
+						networkEdges.put(edgeIndex++, 
+								new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), 0));
+					}
+				}else if(hiddenLayer.containsKey(n1ID)) {
+					if(e.isEnabled()) {
 						float alpha = (e.isActive() ? 1f : TRANS);
 						networkEdges.put(edgeIndex++, 
-								new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
-						//System.out.println("Alpha value " + alpha);
+								new GEdge(hiddenLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
 						//debug_edgeCounter++;
+					} else {
+						networkEdges.put(edgeIndex++, 
+								new GEdge(hiddenLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), 0));
 					}
+	
+				}else {
+					System.out.println("Error: cannot calculate incomin edge's origin");
+				}
 					
 						//System.out.println("Error: Previous node not stored for output node");
 					//System.out.println("The edge " + e.getNode1().getID() + "-" + e.getNode2().getID() + " is active: " + e.isActive()); //Debug
 				}
 				
-			}
 			//System.out.println("I printed " + debug_edgeCounter + " of " + inEdges.size() + " edges");
 			
 			/*Determining the activeness of the node thus the alpha value of the node*/
