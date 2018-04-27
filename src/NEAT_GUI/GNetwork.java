@@ -214,39 +214,51 @@ public class GNetwork implements Serializable{
 				//System.out.println("Placing node at: (" + (startRegionX + equiDistance) + "," + (startRegionY + equiDistance) + ")");
 				y_multiplier++;
 				
-				/*Determining the activeness of the node AND determining the activeness of the incoming edges of the node*/
+				/*
+				 * Determining the activeness of the node AND determining the activeness of the incoming edges of the node
+				 * Activeness is determined by whether there exists an enabled and active incoming edge into the node
+				 */
 				boolean isActive = false;
 				ArrayList<Edge> inEdges = hidden.getIncomingEdges();
+				
 				for(Edge e : inEdges) {
-					isActive = (isActive == true ? true : e.isActive());				
-					int n1ID = e.getNode1().getID();
-					if(inputLayer.containsKey(n1ID)) { 
-						float alpha;
-						/*Only show the edge is active if the input node is non-zero*/
-						if(inputLayer.get(n1ID).getIsActive()) {
-							alpha = (e.isActive() ? 1f : 0.7f);
-						} else {
-							alpha = TRANS;
-						}
+					/*Check if node can be set to active*/
+					if(e.isEnabled() && e.isActive() && isActive == false)
+						isActive = true;
+					
+					/*Create the incoming GEdge*/
+					
+					int n1ID = e.getNode1().getID(); //getting the node previous to hidden
+					if(!e.isEnabled()) { //if edge not enabled, do not display (invisible)
 						networkEdges.put(edgeIndex++,  
-								new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
-					}else if(hiddenLayer.containsKey(n1ID)) {
-						float alpha = (e.isActive() ? 1f : 0.7f);
-						networkEdges.put(edgeIndex++, 
-								new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), alpha));
+								new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),0));
+					} else { //otherwise the edge is enabled and will be displayed
+						if(inputLayer.containsKey(n1ID)) { 
+							/*Only show the edge as opaque if the input node is active*/
+							float alpha;
+							if(inputLayer.get(n1ID).getIsActive()) {
+								alpha = (e.isActive() ? 1f : TRANS); //opaque if edge is active; transparent otherwise
+								networkEdges.put(edgeIndex++,  
+									new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
+							}else {
+								alpha = TRANS; //transparent if input node has value of 0
+								networkEdges.put(edgeIndex++,  
+										new GEdge(inputLayer.get(n1ID),	hiddenLayer.get(hidden.getID()), (float) e.getWeight(),	alpha));
+							}
+						}else if(hiddenLayer.containsKey(n1ID)) {
+							float alpha = (e.isActive() ? 1f : TRANS);
+							networkEdges.put(edgeIndex++, 
+									new GEdge(hiddenLayer.get(n1ID), hiddenLayer.get(hidden.getID()), (float) e.getWeight(), alpha));
+						}
+						//System.out.println("Error: Previous node not stored for hidden node");
+						//System.out.println("The edge is active: " + e.isActive()); //Debug	
 					}
-					//System.out.println("Error: Previous node not stored for hidden node");
-					//System.out.println("The edge is active: " + e.isActive()); //Debug
 				}
 				//System.out.println("The node is active: " + isActive); //Debug
 				hiddenLayer.get(hidden.getID()).setIsActive(isActive);
 				
 				/*Determining the alpha value of the node*/
-				float alpha = 0;
-				if(isActive) 
-					alpha = 1f;
-				else
-					alpha = TRANS;
+				float alpha = (isActive ? 1f : TRANS);
 				hiddenLayer.get(hidden.getID()).setAlpha(alpha);
 			}
 			if(hidNodes.size() > 0)
@@ -259,12 +271,10 @@ public class GNetwork implements Serializable{
 		 * Create and store outLayer GNodes
 		 * ===============================
 		 * Position: Upper Right of the panel, in grid fashion (not scattered)
-		 * Color: Green
+		 * Color: Black
 		 * Opacity: True if there is at least one incoming edge that is active
 		 */
 
-		
-		
 		for(OutputNode output : outLayer) {
 			/*Creating initial output GNode*/
 			double newRegionY = nodeSize + startRegionY;
@@ -273,40 +283,57 @@ public class GNetwork implements Serializable{
 			//System.out.println("startregionx = " + startRegionX);
 			startRegionY = newRegionY;
 			
-			/*Determining the activeness of the node
-			 * AND determining the activeness of the incoming edges of the node*/
-			boolean isActive = false;
+			/*
+			 * Determining the activeness of the incoming edges of the node
+			 * Activeness is determined by whether or not the node is fired
+			 * */
+			
 			ArrayList<Edge> inEdges = output.getIncomingEdges();
 			//System.out.println("Number of incoming edges to output node: " + inEdges.size());
+			//int debug_edgeCounter = 0;
 			for(Edge e : inEdges) {
-				isActive = (isActive == true ? true : e.isActive());				
+				/*Create the incoming GEdge*/
 				int n1ID = e.getNode1().getID();
-				if(inputLayer.containsKey(n1ID)) { 
-					float alpha;
-					/*Only show the edge is active if the input node is non-zero*/
-					if(inputLayer.get(n1ID).getIsActive()) {
-						alpha = (e.isActive() ? 1f : 0.7f);
-					} else {
-						alpha = TRANS;
+				if(!e.isEnabled()) {
+					networkEdges.put(edgeIndex++, 
+							new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), 0));
+				} else {
+					if(inputLayer.containsKey(n1ID)) { 
+						/*Only show the edge if the input node is active*/
+						float alpha;
+						if(inputLayer.get(n1ID).getIsActive()) {
+							alpha = (e.isActive() ? 1f : TRANS);
+							networkEdges.put(edgeIndex++, 
+									new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
+						} else {
+							alpha = TRANS;
+							networkEdges.put(edgeIndex++, 
+									new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
+						}
+						//debug_edgeCounter++;
+						//System.out.println("Alpha value " + alpha);
+					}else if(hiddenLayer.containsKey(n1ID)) {
+						float alpha = (e.isActive() ? 1f : TRANS);
+						networkEdges.put(edgeIndex++, 
+								new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
+						//System.out.println("Alpha value " + alpha);
+						//debug_edgeCounter++;
 					}
-					networkEdges.put(edgeIndex++, 
-							new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
-				}else if(hiddenLayer.containsKey(n1ID)) {
-					float alpha = (e.isActive() ? 1f : 0.7f);
-					networkEdges.put(edgeIndex++, 
-							new GEdge(inputLayer.get(n1ID), outputLayer.get(output.getID()), (float) e.getWeight(), alpha));
+					
+						//System.out.println("Error: Previous node not stored for output node");
+					//System.out.println("The edge " + e.getNode1().getID() + "-" + e.getNode2().getID() + " is active: " + e.isActive()); //Debug
 				}
 				
-					//System.out.println("Error: Previous node not stored for output node");
-				//System.out.println("The edge " + e.getNode1().getID() + "-" + e.getNode2().getID() + " is active: " + e.isActive()); //Debug
 			}
-			//System.out.println("The node is active: " + isActive); //Debug
-			outputLayer.get(output.getID()).setIsActive(isActive);
+			//System.out.println("I printed " + debug_edgeCounter + " of " + inEdges.size() + " edges");
 			
-			/*Determining the alpha value of the node*/
-			//System.out.println("The output node is fired: " + output.checkFired());
-			float alpha = (output.checkFired() ? 1f : TRANS);
+			/*Determining the activeness of the node thus the alpha value of the node*/
+			boolean isActive = output.checkFired();
+			float alpha = (isActive ? 1f : TRANS);
 			outputLayer.get(output.getID()).setAlpha(alpha);
+			outputLayer.get(output.getID()).setIsActive(isActive);
+			//System.out.println("The output node is fired: " + output.checkFired());
+			//System.out.println("The node is active: " + isActive); //Debug
 		}
 	}
 
