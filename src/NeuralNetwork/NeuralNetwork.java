@@ -1,8 +1,10 @@
 package NeuralNetwork;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class NeuralNetwork{
+public class NeuralNetwork implements Serializable{
+	private static final long serialVersionUID = -7961958427589809067L;
 	protected ArrayList<Layer<HiddenNode>> hiddenLayers = new ArrayList<Layer<HiddenNode>>();
 	protected Layer<InputNode> inputLayer = new Layer<InputNode>();
 	protected Layer<OutputNode> outputLayer = new Layer<OutputNode>();

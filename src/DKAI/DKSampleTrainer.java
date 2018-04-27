@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -15,7 +16,8 @@ import Evolution.Species;
 import Evolution.Store;
 import NEAT_GUI.GUINetworkFrame;
 
-public class DKSampleTrainer extends NEAT{
+public class DKSampleTrainer extends NEAT implements Serializable{
+	private static final long serialVersionUID = -8605334741159069816L;
 	private static LuaInterface LI = new LuaInterface("./src/res/LUA.txt");
 	private GUINetworkFrame GNF;
 	
@@ -31,21 +33,11 @@ public class DKSampleTrainer extends NEAT{
 	
 	double sampleFitnessThreshold = 1.0;
 	
+	
 	public DKSampleTrainer() throws IOException{
 		super(LI.getSmallInputs().size(), 5);
 		
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run(){
-				try{
-					GNF = new GUINetworkFrame();
-					GNF.addKeyListener(new inputHandler());
-					GNF.setVisible(true);
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-			}		
-		});
+		initializeGUI();
 		
 		System.out.println(LI.getSmallInputs().size());
 		parallelExecution = true;	//initially we can run parallelExecution on sampleFitness		
@@ -73,8 +65,10 @@ public class DKSampleTrainer extends NEAT{
 		int frameCounter = 0;
 		while(LI.deathFlag == 0){
 			//System.out.println(207-LI.position[6]);
-			if(killFlag)				//end the run if killFlag is set
+			if(killFlag){				//end the run if killFlag is set
+				killFlag = false;
 				break;
+			}
 			if(resetFlag){				//reset game if flag is set
 				LI.startNewGame();
 				resetFlag = false;
@@ -140,6 +134,21 @@ public class DKSampleTrainer extends NEAT{
 		}
 		System.out.println("Finsihed");
 		//f.dispose();
+	}
+	
+	public void initializeGUI(){
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run(){
+				try{
+					GNF = new GUINetworkFrame();
+					GNF.addKeyListener(new inputHandler());
+					GNF.setVisible(true);
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}		
+		});
 	}
 	
 	Boolean finSample = false;
@@ -226,7 +235,8 @@ public class DKSampleTrainer extends NEAT{
 	
 	
 	public double gameFitness(NEATNetwork NN){
-		System.out.println("NUMBER OF HIDDEN LAYERS: " + NN.getHiddenLayers().size());
+		//System.out.println("NUMBER OF HIDDEN LAYERS: " + NN.getHiddenLayers().size());
+		System.out.println("Networks Current Fitness: " + NN.getCurrentFitness());
 		LI.startNewGame();
 		double fitness = 0;
 		LI.updateInputs();										//load inputs
@@ -237,6 +247,11 @@ public class DKSampleTrainer extends NEAT{
 		int lastX = LI.position[5];
 		
 		while(LI.deathFlag == 0){									//keep running until death
+			if(killFlag){				//end the run if killFlag is set
+				killFlag = false;
+				break;
+			}
+			
 			LI.updateInputs();
 			inputs = LI.getSmallInputs();
 			for(int i=0; i<inputs.size(); i++){						//set the value for each input node
@@ -321,8 +336,12 @@ public class DKSampleTrainer extends NEAT{
 			}
 			
 			if(key == KeyEvent.VK_S){				//press "E" to kill the run
-				Store store = new Store();
-				store.saveNet(getBestNetwork(), new File("./src/res/bestNetwork.network"));
+				System.out.println("Save Flag Set. Save will be executed at the end of this Generation.");
+				saveFlag = true;
+			}
+			if(key == KeyEvent.VK_D){				//press "E" to kill the run
+				System.out.println("Load Flag Set.");
+				loadFlag = true;
 			}
 		}
 

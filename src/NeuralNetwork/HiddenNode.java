@@ -1,7 +1,10 @@
 package NeuralNetwork;
 
-public class HiddenNode extends Node{
-	
+import java.io.Serializable;
+
+public class HiddenNode extends Node implements Serializable{
+	private static final long serialVersionUID = -4440628456365235415L;
+
 	public HiddenNode(int id){
 		super(id);
 	}

@@ -1,8 +1,10 @@
 package NeuralNetwork;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Node {
+public abstract class Node implements Serializable{
+	private static final long serialVersionUID = -5259001247828148776L;
 	protected static final double e = 2.71828;
 	protected static final double fireThreshold  = 0.75;
 	

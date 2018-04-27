@@ -13,6 +13,7 @@ import NeuralNetwork.Node;
 import NeuralNetwork.OutputNode;
 
 public class NEATNetwork extends NeuralNetwork implements Serializable{
+	private static final long serialVersionUID = 3505588009006523344L;
 	ArrayList<NodeGene> nodeGeneList = new ArrayList<NodeGene>();
 	ArrayList<ConnectGene> connectGeneList = new ArrayList<ConnectGene>();
 	double currentFitness = 0;

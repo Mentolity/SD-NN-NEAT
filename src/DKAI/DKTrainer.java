@@ -1,12 +1,14 @@
 package DKAI;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import Evolution.NEAT;
 import Evolution.NEATNetwork;
 
-public class DKTrainer extends NEAT{
+public class DKTrainer extends NEAT implements Serializable{
+	private static final long serialVersionUID = 5445421831492562896L;
 	static LuaInterface LI = new LuaInterface("./src/res/LUA.txt");
 	
 	public DKTrainer() throws IOException {

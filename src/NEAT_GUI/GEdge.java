@@ -1,4 +1,6 @@
 package NEAT_GUI;
+import java.io.Serializable;
+
 /*
  * Swing classes
  * =========================
@@ -14,8 +16,8 @@ import javax.swing.JComponent;
  * getStartNode(): returns starting GNode of GEdge
  * getEndNode(): returns ending GNode of GEdge
  */
-public class GEdge extends JComponent{
-
+public class GEdge extends JComponent implements Serializable{
+	private static final long serialVersionUID = -4388065547866000350L;
 	private float weight;
 	private GNode startNode, endNode;
 	private float alpha;

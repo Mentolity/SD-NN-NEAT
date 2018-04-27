@@ -1,5 +1,7 @@
+
 package NEAT_GUI;
 import java.awt.Color;
+import java.io.Serializable;
 
 /*
  * Swing classes
@@ -15,7 +17,8 @@ import javax.swing.JComponent;
  * getXCoor(): Returns X coordinate of GNode
  * getYCoor(): Returns Y coordinate of GNode
  */
-public class GNode extends JComponent{
+public class GNode extends JComponent implements Serializable{
+	private static final long serialVersionUID = 1928698671568792426L;
 	
 	private double xcoor, ycoor;
 	private Color color;

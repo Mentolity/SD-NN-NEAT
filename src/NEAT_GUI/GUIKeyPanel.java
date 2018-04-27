@@ -5,12 +5,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public class GUIKeyPanel extends JPanel{
-	
+public class GUIKeyPanel extends JPanel implements Serializable{
+	private static final long serialVersionUID = 302896278482984277L;
+
 	public GUIKeyPanel() {
 		setBackground(Color.DARK_GRAY);
 		this.setBounds(0, 0, 1250, 300);

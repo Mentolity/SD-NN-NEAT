@@ -1,6 +1,9 @@
 package NeuralNetwork;
 
-public class OutputNode extends Node{
+import java.io.Serializable;
+
+public class OutputNode extends Node implements Serializable{
+	private static final long serialVersionUID = -2532734913521168794L;
 	Boolean fired = false;
 	public OutputNode(int id){
 		super(id);

@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
@@ -49,7 +50,8 @@ import Evolution.NEATNetwork;
  * 
  * GNeuralNetwork(): Constructor for GNeuralNetwork JFrame	
  */
-public class GUINetworkFrame extends JFrame{
+public class GUINetworkFrame extends JFrame implements Serializable{
+	private static final long serialVersionUID = 8189730560775654548L;
 
 	private JPanel contentPane = (JPanel) getContentPane();
 	
@@ -88,8 +90,14 @@ public class GUINetworkFrame extends JFrame{
 	
 	public void updateNetwork(NeuralNetwork n, int num){
 		GNetwork gNetwork = new GNetwork(n, num);
+		gNetworks.clear();
 		gNetworks.add(gNetwork);
 		
+		
 		guiNetworkPanel.setNetwork(gNetwork);
+	}
+	
+	public void setFrameTitle(String title) {
+		setTitle(title);
 	}
 }

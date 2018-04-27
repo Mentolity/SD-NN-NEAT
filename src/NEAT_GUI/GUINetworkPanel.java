@@ -35,6 +35,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -48,10 +49,11 @@ import java.awt.Color;
  * paintComponent(Graphics g): Overridden method; renders objects
  */
 
-public class GUINetworkPanel extends JPanel{
+public class GUINetworkPanel extends JPanel implements Serializable{
+	private static final long serialVersionUID = -3891058941307857281L;
 
 	private GNetwork gNetwork;
-	private int nodeSize;
+	private double nodeSize;
 	/*
 	 * Constructor 
 	 */
@@ -100,6 +102,7 @@ public class GUINetworkPanel extends JPanel{
 		GNode n2 = c.getEndNode();
 		
 		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, c.getAlpha());
+		//System.out.println("The alpha value is " + c.getAlpha());
 		g2d.setComposite(alcom);
 		
 		if(c.getWeight() > 0) g2d.setColor(Color.WHITE);
@@ -149,11 +152,13 @@ public class GUINetworkPanel extends JPanel{
 			
 
 			//Paint hidden nodes per hidden layer
+			nodeSize = gNetwork.getHidNodeSize();
 			while(hidKeyIter.hasNext()) {
 				paintNode(g2d, hidLayers.get(hidKeyIter.next()));
 			}
 
 			//Paint output nodes
+			nodeSize = gNetwork.getNodeSize();
 			while(outKeyIter.hasNext()) {
 				paintNode(g2d, outLayer.get(outKeyIter.next()));
 			}		

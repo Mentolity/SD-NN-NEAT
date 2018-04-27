@@ -1,4 +1,5 @@
 package Main;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,8 +8,8 @@ import ChessAI.ChessSampleTrainer;
 import DKAI.DKSampleTrainer;
 import DKAI.DKTrainer;
 import DKAI.LuaInterface;
-import DKAI.WatchDir;
 import Evolution.NEAT;
+import Evolution.Store;
 import ImageCategorizer.ImageProcessor;
 import ImageCategorizer.ImageTrainer;
 import NeuralNetwork.Edge;
@@ -29,11 +30,20 @@ public class Main {
         Thread.sleep(2000);
         LI.updateInputs();*/
 		
+
+		Store store = new Store();
+		//DKSampleTrainer test = new DKSampleTrainer();
+		DKSampleTrainer test = (DKSampleTrainer)store.loadNEAT(new File("./src/res/NEAT-CleanRun2.network"));
+		test.initializeGUI();
 		
-		DKSampleTrainer test = new DKSampleTrainer();
-		while(true)
+		while(true){
 			test.runGeneration();
-		
+			if(test.saveFlag){
+				test.saveFlag = false;
+				store.saveNEAT(test, new File("./src/res/bestNetwork.network"));
+				System.out.println("SAVED NEAT");
+			}
+		}
 		
 		/*ChessSampleTrainer test = new ChessSampleTrainer();
 		while(true)

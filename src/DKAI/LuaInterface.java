@@ -3,10 +3,12 @@ package DKAI;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class LuaInterface {
+public class LuaInterface implements Serializable{
+	private static final long serialVersionUID = -1058014365856742153L;
 	public int[] platforms = new int[338];
 	public int[] ladders = new int[76];
 	public int[] enemies2 = new int[44];

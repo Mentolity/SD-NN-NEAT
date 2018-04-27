@@ -2,13 +2,9 @@ package Evolution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Random;
-
 import NeuralNetwork.Edge;
 import NeuralNetwork.HiddenNode;
 import NeuralNetwork.InputNode;
-import NeuralNetwork.Layer;
-import NeuralNetwork.Node;
 import NeuralNetwork.OutputNode;
 
 public class NEAT implements Serializable{
@@ -65,6 +61,8 @@ public class NEAT implements Serializable{
 	protected int generationCount = 0;		//number of generations that have passed
 	
 	protected boolean parallelExecution = false;	//set true in child class if the current fitness execution can be ran in parrallel
+	public boolean saveFlag = false;
+	public boolean loadFlag = false;
 	
 	
 	public NEAT(int numInputNodes, int numOutputNodes){	
@@ -181,8 +179,7 @@ public class NEAT implements Serializable{
 		
 		for(int i=0; i<population.size(); i++){
 			Species s = population.get(i);	
-			Boolean stagnant = false;				
-			
+			Boolean stagnant = false;
 			
 			if(s.getGenerationsWithoutImprovement() >= MAXSTAGNENTGENERATIONS)
 				stagnant = true;	
@@ -455,7 +452,7 @@ public class NEAT implements Serializable{
 				if(ng.getNode() instanceof InputNode || ng.getNode() instanceof OutputNode)
 					NN.nodeGeneList.add(ng);
 			
-			ArrayList<ConnectGene> cgList = new ArrayList<ConnectGene>();		//list of crossed-over connect genes
+			//ArrayList<ConnectGene> cgList = new ArrayList<ConnectGene>();		//list of crossed-over connect genes
 			ArrayList<Integer> nodeIDList = new ArrayList<Integer>();			//list of added nodes
 			NN1.sortConnectGeneList();											//sort connectgenes low to high by innovation number
 			NN2.sortConnectGeneList();

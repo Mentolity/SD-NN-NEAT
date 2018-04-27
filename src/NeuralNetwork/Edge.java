@@ -1,6 +1,9 @@
 package NeuralNetwork;
 
-public class Edge {
+import java.io.Serializable;
+
+public class Edge implements Serializable{
+	private static final long serialVersionUID = 7143411179771103570L;
 	double weight;
 	boolean active = false; //set true when neuron fires on edge else false
 	boolean enabled = true;
